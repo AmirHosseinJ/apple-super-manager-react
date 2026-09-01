@@ -59,7 +59,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 *.swo
 *.sublime-workspace
 
-# OS files
+# OS Files
 .DS_Store
 Thumbs.db
 ehthumbs.db
