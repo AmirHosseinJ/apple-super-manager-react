@@ -1,0 +1,40 @@
+# ---- Dependencies ----
+node_modules
+.pnp
+.pnp.*
+.yarn
+
+# ---- Build output ----
+build
+dist
+out
+.vite
+
+# ---- Environment / secrets ----
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# ---- Version control / IDE ----
+.git
+.gitignore
+.idea
+.vscode
+
+# ---- Logs & caches ----
+*.log
+npm-debug.log*
+.cache
+.eslintcache
+.npm
+
+# ---- Docker (avoid copying itself into build context) ----
+Dockerfile
+.dockerignore
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+Desktop.ini
