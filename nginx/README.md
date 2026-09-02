@@ -4,7 +4,8 @@ This folder contains Nginx configs for exposing the Apple Super Manager React fr
 
 ## Files
 
-- `frontend.https.conf` — recommended HTTPS config for `https://manager.goldappleid.ir/`, proxying to `asm-frontend:80`.
+- rontend.http.conf — HTTP-only config for first-time Certbot challenge on manager.goldappleid.ir.
+- rontend.https.conf — HTTPS config for https://manager.goldappleid.ir/, proxying to sm-frontend:80.
 - `frontend.conf` — temporary no-domain HTTP/IP config on port `8088`.
 
 ## Recommended Docker Nginx Mount
@@ -14,7 +15,8 @@ Because Nginx runs inside Docker, keep this config in the project directory and 
 In the Docker Compose file that runs `appl_nginx`, add this under the `nginx.volumes` list:
 
 ```yaml
-- /srv/apple-super-manager/super-manager/nginx/frontend.https.conf:/etc/nginx/conf.d/apple-super-manager-frontend.conf:ro
+- /srv/apple-super-manager/super-manager/nginx/frontend.http.conf:/etc/nginx/conf.d/apple-super-manager-frontend-http.conf:ro
+- /srv/apple-super-manager/super-manager/nginx/frontend.https.conf:/etc/nginx/conf.d/apple-super-manager-frontend-https.conf:ro
 ```
 
 This avoids copying the config into another project directory and keeps the source of truth here:
@@ -80,3 +82,4 @@ In Keycloak admin, update the `super-manager-app` client:
 Valid redirect URIs: https://manager.goldappleid.ir/*
 Web origins: https://manager.goldappleid.ir
 ```
+
