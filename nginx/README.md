@@ -56,7 +56,7 @@ VITE_APPLE_PROXY_API_URL=/api/proxy-manager
 ```
 
 The relative API URL keeps browser requests on `https://manager.goldappleid.ir`, and
-`frontend.https.conf` proxies `/api/proxy-manager/` to `https://goldappleid.ir`.
+`frontend.https.conf` proxies `/api/proxy-manager/` to `https://proxy.goldappleid.ir`.
 This avoids browser CORS preflights between the dashboard and the managed API.
 
 Then rebuild because Vite embeds these values during build:
