@@ -21,7 +21,7 @@ const REALM = process.env.VITE_KEYCLOAK_REALM || 'central'
 const CLIENT_ID = process.env.VITE_KEYCLOAK_CLIENT_ID || 'super-manager-app'
 const APP_URL = process.env.APP_URL || 'http://localhost:5173'
 const USERNAME = process.env.TEST_USERNAME || 'admin'
-const PASSWORD = process.env.TEST_PASSWORD || 'admin123'
+const PASSWORD = process.env.TEST_PASSWORD || 'admin'
 const REDIRECT_URI = `${APP_URL}/dashboard`
 
 const green = (s) => `\x1b[32m${s}\x1b[0m`

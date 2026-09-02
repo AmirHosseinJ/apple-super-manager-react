@@ -48,7 +48,7 @@ them via a root `.env` file or the shell, then rebuild:
 VITE_KEYCLOAK_URL=https://auth.example.com docker compose up -d --build frontend
 ```
 
-Default realm user: `admin` / `admin123` (realm `central`, client `super-manager-app`).
+Default realm user: `admin` / `admin` (realm `central`, client `super-manager-app`).
 
 ## Configuration
 
