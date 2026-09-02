@@ -5,6 +5,8 @@ import path from 'node:path'
 import autoprefixer from 'autoprefixer'
 
 export default defineConfig(() => {
+  const appleProxyApiTarget = process.env.VITE_DEV_APPLE_PROXY_API_TARGET || 'http://127.0.0.1:8000'
+
   return {
     base: '/',
     build: {
@@ -41,6 +43,12 @@ export default defineConfig(() => {
     server: {
       port: 5173,
       strictPort: true,
+      proxy: {
+        '/api/proxy-manager': {
+          target: appleProxyApiTarget,
+          changeOrigin: true,
+        },
+      },
     },
   }
 })

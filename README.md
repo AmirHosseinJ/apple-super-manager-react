@@ -59,6 +59,8 @@ Copy `.env.example` to `.env` and adjust if needed:
 | `VITE_KEYCLOAK_URL` | `http://localhost:8080` | Keycloak base URL |
 | `VITE_KEYCLOAK_REALM` | `central` | Realm name |
 | `VITE_KEYCLOAK_CLIENT_ID` | `super-manager-app` | Public client id |
+| `VITE_APPLE_PROXY_API_URL` | `/api/proxy-manager` | Apple Proxy API path; keep relative to avoid browser CORS |
+| `VITE_DEV_APPLE_PROXY_API_TARGET` | `http://127.0.0.1:8000` | Dev-server proxy target for `/api/proxy-manager` |
 
 The dev server is pinned to port **5173** because the realm's redirect URIs and web
 origins are registered for that origin.
@@ -117,5 +119,4 @@ TEST_USERNAME=someone TEST_PASSWORD=secret npm run test:login
 | `npm run serve` | Preview the production build |
 | `npm run lint` | ESLint + Prettier (`-- --fix` to autofix) |
 | `npm run test:login` | End-to-end Keycloak login smoke test |
-
 

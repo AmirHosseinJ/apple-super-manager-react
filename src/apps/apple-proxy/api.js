@@ -1,7 +1,7 @@
 import { createApiClient } from '../../api/http'
 
 export const APPLE_PROXY_BASE_URL =
-  import.meta.env.VITE_APPLE_PROXY_API_URL || 'http://127.0.0.1:8000/api/proxy-manager'
+  import.meta.env.VITE_APPLE_PROXY_API_URL || '/api/proxy-manager'
 
 const client = createApiClient({ baseUrl: APPLE_PROXY_BASE_URL })
 
