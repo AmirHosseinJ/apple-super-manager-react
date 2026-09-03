@@ -71,8 +71,8 @@ Root Docker settings live in `../.env.example`:
 
 | Variable | Description |
 | --- | --- |
-| `KC_BOOTSTRAP_ADMIN_USERNAME` | Keycloak bootstrap admin username |
-| `KC_BOOTSTRAP_ADMIN_PASSWORD` | Keycloak bootstrap admin password; required by Compose |
+| `KEYCLOAK_ADMIN` | Keycloak bootstrap admin username |
+| `KEYCLOAK_ADMIN_PASSWORD` | Keycloak bootstrap admin password; required by Compose |
 | `ASM_REALM_ADMIN_USERNAME` | Username for the seeded realm administrator |
 | `ASM_REALM_ADMIN_PASSWORD` | Password for the seeded realm administrator; required by Compose |
 | `ASM_REALM_ADMIN_EMAIL` | Email for the seeded realm administrator |
