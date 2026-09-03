@@ -28,9 +28,11 @@ npm run dev        # http://localhost:5173
 
 ### Full Docker stack (Keycloak + containerized frontend)
 
-From the repo root, build and run everything:
+From the repo root, create a local `.env` from `.env.example`, change the placeholder
+passwords, then build and run everything:
 
 ```bash
+cp .env.example .env
 docker compose up -d --build
 ```
 
@@ -41,14 +43,17 @@ The frontend is a multi-stage build (`super-manager/Dockerfile`): Node builds th
 bundle, then nginx (`super-manager/nginx.conf`) serves the static output with SPA
 fallback. Because Vite inlines `VITE_*` values at **build time**, they are passed as
 build args in `docker-compose.yml` and must reference URLs the **browser** can reach
-(hence `http://localhost:8080` for Keycloak, not an internal Docker hostname). Override
-them via a root `.env` file or the shell, then rebuild:
+(hence `http://localhost:8080` for local Keycloak, not an internal Docker hostname).
+Override them via a root `.env` file or the shell, then rebuild:
 
 ```bash
 VITE_KEYCLOAK_URL=https://auth.example.com docker compose up -d --build frontend
 ```
 
-Default realm user: `admin` / `admin` (realm `central`, client `super-manager-app`).
+The imported realm uses the `ASM_REALM_ADMIN_*` values from the root `.env` file for
+its initial administrator (realm `central`, client `super-manager-app`). Change these
+values before the first import; Keycloak will not update an existing imported realm on
+later container starts.
 
 ## Configuration
 
@@ -61,6 +66,16 @@ Copy `.env.example` to `.env` and adjust if needed:
 | `VITE_KEYCLOAK_CLIENT_ID` | `super-manager-app` | Public client id |
 | `VITE_APPLE_PROXY_API_URL` | `/api/proxy-manager` | Apple Proxy API path; keep relative to avoid browser CORS |
 | `VITE_DEV_APPLE_PROXY_API_TARGET` | `http://127.0.0.1:8000` | Dev-server proxy target for `/api/proxy-manager` |
+
+Root Docker settings live in `../.env.example`:
+
+| Variable | Description |
+| --- | --- |
+| `KC_BOOTSTRAP_ADMIN_USERNAME` | Keycloak bootstrap admin username |
+| `KC_BOOTSTRAP_ADMIN_PASSWORD` | Keycloak bootstrap admin password; required by Compose |
+| `ASM_REALM_ADMIN_USERNAME` | Username for the seeded realm administrator |
+| `ASM_REALM_ADMIN_PASSWORD` | Password for the seeded realm administrator; required by Compose |
+| `ASM_REALM_ADMIN_EMAIL` | Email for the seeded realm administrator |
 
 The dev server is pinned to port **5173** because the realm's redirect URIs and web
 origins are registered for that origin.
@@ -119,4 +134,3 @@ TEST_USERNAME=someone TEST_PASSWORD=secret npm run test:login
 | `npm run serve` | Preview the production build |
 | `npm run lint` | ESLint + Prettier (`-- --fix` to autofix) |
 | `npm run test:login` | End-to-end Keycloak login smoke test |
-

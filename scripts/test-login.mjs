@@ -20,8 +20,8 @@ const KC_URL = process.env.VITE_KEYCLOAK_URL || 'http://localhost:8080'
 const REALM = process.env.VITE_KEYCLOAK_REALM || 'central'
 const CLIENT_ID = process.env.VITE_KEYCLOAK_CLIENT_ID || 'super-manager-app'
 const APP_URL = process.env.APP_URL || 'http://localhost:5173'
-const USERNAME = process.env.TEST_USERNAME || 'admin'
-const PASSWORD = process.env.TEST_PASSWORD || 'admin'
+const USERNAME = process.env.TEST_USERNAME || process.env.ASM_REALM_ADMIN_USERNAME || 'realm-admin'
+const PASSWORD = process.env.TEST_PASSWORD || process.env.ASM_REALM_ADMIN_PASSWORD || ''
 const REDIRECT_URI = `${APP_URL}/dashboard`
 
 const green = (s) => `\x1b[32m${s}\x1b[0m`
@@ -55,6 +55,13 @@ const base64url = (buf) =>
   buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 
 const main = async () => {
+  if (!PASSWORD) {
+    fail(
+      'Missing login test password',
+      'Set TEST_PASSWORD or ASM_REALM_ADMIN_PASSWORD before running npm run test:login.',
+    )
+  }
+
   console.log(dim(`realm    ${KC_URL}/realms/${REALM}`))
   console.log(dim(`client   ${CLIENT_ID}`))
   console.log(dim(`user     ${USERNAME}\n`))
