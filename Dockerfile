@@ -7,7 +7,7 @@ WORKDIR /app
 
 # Vite inlines VITE_* variables at build time, so they must be present
 # during `npm run build`. They are passed as build args (see docker-compose.yml).
-ARG VITE_KEYCLOAK_URL=http://localhost:8080
+ARG VITE_KEYCLOAK_URL=https://keycloak.goldappleid.ir
 ARG VITE_KEYCLOAK_REALM=central
 ARG VITE_KEYCLOAK_CLIENT_ID=super-manager-app
 ARG VITE_APPLE_PROXY_API_URL=/api/proxy-manager
