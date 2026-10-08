@@ -208,7 +208,7 @@ export const createApiClient = ({ baseUrl }) => {
   const download = async (path, options = {}) => {
     const response = await fetchResponse('GET', path, {
       ...options,
-      accept: 'application/octet-stream',
+      accept: '*/*',
     })
     const url = `${normalisedBase}${path}${buildQueryString(options.params)}`
 
