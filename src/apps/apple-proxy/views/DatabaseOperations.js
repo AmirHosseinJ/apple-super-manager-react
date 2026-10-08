@@ -7,6 +7,11 @@ import {
   CCardHeader,
   CFormInput,
   CFormSelect,
+  CModal,
+  CModalBody,
+  CModalFooter,
+  CModalHeader,
+  CModalTitle,
 } from '@coreui/react'
 
 import { useCollection, useMutation } from '../../../api/hooks'
@@ -56,6 +61,8 @@ const DatabaseOperations = () => {
   const [deleting, setDeleting] = useState(null)
   const [downloadingId, setDownloadingId] = useState(null)
   const [trackedOperation, setTrackedOperation] = useState(null)
+  const [uploadFile, setUploadFile] = useState(null)
+  const [uploadVisible, setUploadVisible] = useState(false)
 
   const backups = useCollection(
     useCallback((options) => databaseBackups.list(options), []),
@@ -70,6 +77,7 @@ const DatabaseOperations = () => {
   const { refresh: refreshRestores } = restores
 
   const createMutation = useMutation(() => databaseBackups.create())
+  const uploadMutation = useMutation((file) => databaseBackups.upload(file))
   const deleteMutation = useMutation((backup) => databaseBackups.remove(backup.id))
   const restoreMutation = useMutation((backup, confirmation) =>
     databaseBackups.restore(backup.id, confirmation),
@@ -130,6 +138,32 @@ const DatabaseOperations = () => {
       refreshBackups()
     } catch (error) {
       showNotice(error.isConflict ? 'warning' : 'danger', error.message)
+    }
+  }
+
+  const closeUpload = () => {
+    if (uploadMutation.pending) return
+    setUploadVisible(false)
+    setUploadFile(null)
+    uploadMutation.reset()
+  }
+
+  const handleUpload = async () => {
+    if (!uploadFile) return
+
+    try {
+      const backup = await uploadMutation.run(uploadFile)
+      if (backup?.id) setTrackedOperation({ kind: 'backup', id: backup.id })
+      setUploadVisible(false)
+      setUploadFile(null)
+      uploadMutation.reset()
+      showNotice(
+        'info',
+        'Backup uploaded and queued for validation. This page will refresh until it reaches a terminal status.',
+      )
+      refreshBackups()
+    } catch {
+      // Rendered in the upload dialog.
     }
   }
 
@@ -335,16 +369,27 @@ const DatabaseOperations = () => {
     <>
       <PageHeader
         title="Database Operations"
-        description="Create, download, delete, and restore PostgreSQL backups for Apple Proxy. These files contain the complete database and must be handled as sensitive data."
+        description="Create, upload, download, delete, and restore PostgreSQL backups for Apple Proxy. These files contain the complete database and must be handled as sensitive data."
         actions={
-          <CButton
-            color="primary"
-            onClick={handleCreate}
-            disabled={operationActive || maintenanceActive}
-          >
-            <i className="fa-solid fa-database me-2" />
-            Create backup
-          </CButton>
+          <div className="d-flex gap-2">
+            <CButton
+              color="secondary"
+              variant="outline"
+              onClick={() => setUploadVisible(true)}
+              disabled={operationActive || maintenanceActive}
+            >
+              <i className="fa-solid fa-upload me-2" />
+              Upload backup
+            </CButton>
+            <CButton
+              color="primary"
+              onClick={handleCreate}
+              disabled={operationActive || maintenanceActive}
+            >
+              <i className="fa-solid fa-database me-2" />
+              Create backup
+            </CButton>
+          </div>
         }
       />
 
@@ -454,6 +499,50 @@ const DatabaseOperations = () => {
           Restore history remains available because restore jobs retain their source snapshot.
         </p>
       </ConfirmDialog>
+
+      <CModal visible={uploadVisible} onClose={closeUpload} alignment="center" backdrop="static">
+        <CModalHeader closeButton={!uploadMutation.pending}>
+          <CModalTitle>Upload database backup</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+          <p>
+            Choose one PostgreSQL custom-format <code>.dump</code> file. The server will validate it
+            before allowing download or restore.
+          </p>
+          <CFormInput
+            type="file"
+            accept=".dump,application/octet-stream"
+            disabled={uploadMutation.pending}
+            onChange={(event) => setUploadFile(event.target.files?.[0] || null)}
+            aria-label="Database backup file"
+          />
+          {uploadMutation.error && (
+            <CAlert
+              color={uploadMutation.error.isConflict ? 'warning' : 'danger'}
+              className="mt-3 mb-0"
+            >
+              {uploadMutation.error.message}
+            </CAlert>
+          )}
+        </CModalBody>
+        <CModalFooter>
+          <CButton
+            color="secondary"
+            variant="ghost"
+            onClick={closeUpload}
+            disabled={uploadMutation.pending}
+          >
+            Cancel
+          </CButton>
+          <CButton
+            color="primary"
+            onClick={handleUpload}
+            disabled={!uploadFile || uploadMutation.pending || operationActive || maintenanceActive}
+          >
+            {uploadMutation.pending ? 'Uploading…' : 'Upload backup'}
+          </CButton>
+        </CModalFooter>
+      </CModal>
 
       <ConfirmDialog
         visible={Boolean(restoreTarget)}

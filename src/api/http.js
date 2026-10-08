@@ -31,6 +31,8 @@ export class ApiError extends Error {
         return detail || 'The requested item no longer exists.'
       case 409:
         return detail || 'The request conflicts with the current server state.'
+      case 413:
+        return detail || 'The uploaded file exceeds the server size limit.'
       case 500:
       case 502:
       case 503:
@@ -167,7 +169,7 @@ const parseDownloadFilename = (contentDisposition) => {
 export const createApiClient = ({ baseUrl }) => {
   const normalisedBase = String(baseUrl || '').replace(/\/+$/, '')
 
-  const fetchResponse = async (method, path, { body, params, signal, accept } = {}) => {
+  const fetchResponse = async (method, path, { body, formData, params, signal, accept } = {}) => {
     const token = await refreshToken()
     const url = `${normalisedBase}${path}${buildQueryString(params)}`
 
@@ -180,7 +182,7 @@ export const createApiClient = ({ baseUrl }) => {
         method,
         headers,
         signal,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: formData ?? (body === undefined ? undefined : JSON.stringify(body)),
       })
     } catch (error) {
       if (error && error.name === 'AbortError') throw error
@@ -226,6 +228,7 @@ export const createApiClient = ({ baseUrl }) => {
     download,
     get: (path, options) => request('GET', path, options),
     post: (path, body, options) => request('POST', path, { ...options, body: body ?? {} }),
+    postForm: (path, formData, options) => request('POST', path, { ...options, formData }),
     put: (path, body, options) => request('PUT', path, { ...options, body: body ?? {} }),
     patch: (path, body, options) => request('PATCH', path, { ...options, body: body ?? {} }),
     delete: (path, options) => request('DELETE', path, options),

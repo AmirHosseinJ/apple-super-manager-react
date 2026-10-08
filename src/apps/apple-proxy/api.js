@@ -68,6 +68,11 @@ export const databaseBackups = {
   list: (options) => client.get('/backups/', options),
   retrieve: (id, options) => client.get(`/backups/${id}/`, options),
   create: () => client.post('/backups/', {}),
+  upload: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return client.postForm('/backups/upload/', formData)
+  },
   remove: (id, options) => client.delete(`/backups/${id}/`, options),
   download: (id, options) => client.download(`/backups/${id}/download/`, options),
   restore: (id, confirmation) => client.post(`/backups/${id}/restore/`, { confirmation }),
