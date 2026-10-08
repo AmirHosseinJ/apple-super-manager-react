@@ -4,4 +4,10 @@ export { default as ErrorState } from './ErrorState'
 export { default as PageHeader } from './PageHeader'
 export { default as RelativeTime, formatAbsolute, formatRelative } from './RelativeTime'
 export { default as ResourceModal } from './ResourceModal'
-export { default as StatusBadge, clientStatusColor, healthColor, outcomeColor } from './StatusBadge'
+export {
+  default as StatusBadge,
+  clientStatusColor,
+  databaseStatusColor,
+  healthColor,
+  outcomeColor,
+} from './StatusBadge'

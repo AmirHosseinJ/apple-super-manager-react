@@ -141,6 +141,25 @@ const parseBody = async (response) => {
   return text
 }
 
+const parseDownloadFilename = (contentDisposition) => {
+  if (!contentDisposition) return null
+
+  const encoded = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i)
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded[1])
+    } catch {
+      return encoded[1]
+    }
+  }
+
+  const quoted = contentDisposition.match(/filename="([^"]+)"/i)
+  if (quoted) return quoted[1]
+
+  const plain = contentDisposition.match(/filename=([^;]+)/i)
+  return plain ? plain[1].trim() : null
+}
+
 /**
  * Creates a thin fetch wrapper bound to one managed app's API origin.
  * Every call carries a freshly refreshed Keycloak bearer token.
@@ -148,17 +167,16 @@ const parseBody = async (response) => {
 export const createApiClient = ({ baseUrl }) => {
   const normalisedBase = String(baseUrl || '').replace(/\/+$/, '')
 
-  const request = async (method, path, { body, params, signal } = {}) => {
+  const fetchResponse = async (method, path, { body, params, signal, accept } = {}) => {
     const token = await refreshToken()
     const url = `${normalisedBase}${path}${buildQueryString(params)}`
 
-    const headers = { Accept: 'application/json' }
+    const headers = { Accept: accept || 'application/json' }
     if (token) headers.Authorization = `Bearer ${token}`
     if (body !== undefined) headers['Content-Type'] = 'application/json'
 
-    let response
     try {
-      response = await fetch(url, {
+      return await fetch(url, {
         method,
         headers,
         signal,
@@ -168,22 +186,44 @@ export const createApiClient = ({ baseUrl }) => {
       if (error && error.name === 'AbortError') throw error
       throw new ApiError(0, { detail: error?.message }, url)
     }
+  }
 
+  const throwForResponse = async (response, url) => {
     const payload = await parseBody(response)
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        keycloak.login()
-      }
-      throw new ApiError(response.status, payload, url)
+    if (response.status === 401) {
+      keycloak.login()
     }
+    throw new ApiError(response.status, payload, url)
+  }
 
-    return payload
+  const request = async (method, path, options = {}) => {
+    const response = await fetchResponse(method, path, options)
+    const url = `${normalisedBase}${path}${buildQueryString(options.params)}`
+
+    if (!response.ok) return throwForResponse(response, url)
+
+    return parseBody(response)
+  }
+
+  const download = async (path, options = {}) => {
+    const response = await fetchResponse('GET', path, {
+      ...options,
+      accept: 'application/octet-stream',
+    })
+    const url = `${normalisedBase}${path}${buildQueryString(options.params)}`
+
+    if (!response.ok) return throwForResponse(response, url)
+
+    return {
+      blob: await response.blob(),
+      filename: parseDownloadFilename(response.headers.get('content-disposition')),
+    }
   }
 
   return {
     baseUrl: normalisedBase,
     request,
+    download,
     get: (path, options) => request('GET', path, options),
     post: (path, body, options) => request('POST', path, { ...options, body: body ?? {} }),
     put: (path, body, options) => request('PUT', path, { ...options, body: body ?? {} }),

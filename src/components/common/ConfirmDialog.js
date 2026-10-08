@@ -19,6 +19,7 @@ const ConfirmDialog = ({
   confirmLabel = 'Confirm',
   confirmColor = 'danger',
   pending = false,
+  confirmDisabled = false,
   error = null,
   onConfirm,
   onClose,
@@ -35,7 +36,7 @@ const ConfirmDialog = ({
       <CButton color="secondary" variant="outline" onClick={onClose} disabled={pending}>
         Cancel
       </CButton>
-      <CButton color={confirmColor} onClick={onConfirm} disabled={pending}>
+      <CButton color={confirmColor} onClick={onConfirm} disabled={pending || confirmDisabled}>
         {pending && <CSpinner size="sm" className="me-2" />}
         {confirmLabel}
       </CButton>
@@ -50,6 +51,7 @@ ConfirmDialog.propTypes = {
   confirmLabel: PropTypes.string,
   confirmColor: PropTypes.string,
   pending: PropTypes.bool,
+  confirmDisabled: PropTypes.bool,
   error: PropTypes.object,
   onConfirm: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,

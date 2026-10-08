@@ -28,9 +28,17 @@ const CLIENT_STATUS_COLORS = {
   released: 'secondary',
 }
 
+const DATABASE_STATUS_COLORS = {
+  queued: 'info',
+  running: 'primary',
+  completed: 'success',
+  failed: 'danger',
+}
+
 export const clientStatusColor = (status) => CLIENT_STATUS_COLORS[status] || 'secondary'
 export const healthColor = (status) => HEALTH_COLORS[status] || 'secondary'
 export const outcomeColor = (outcome) => OUTCOME_COLORS[outcome] || 'secondary'
+export const databaseStatusColor = (status) => DATABASE_STATUS_COLORS[status] || 'secondary'
 
 const humanise = (value) => String(value ?? '').replace(/_/g, ' ')
 
@@ -58,6 +66,7 @@ const StatusBadge = ({ value, kind = 'health', className = '' }) => {
   let color = healthColor(value)
   if (kind === 'outcome') color = outcomeColor(value)
   else if (kind === 'clientStatus') color = clientStatusColor(value)
+  else if (kind === 'database') color = databaseStatusColor(value)
 
   return (
     <CBadge color={color} className={`text-capitalize ${className}`}>
@@ -68,7 +77,7 @@ const StatusBadge = ({ value, kind = 'health', className = '' }) => {
 
 StatusBadge.propTypes = {
   value: PropTypes.any,
-  kind: PropTypes.oneOf(['health', 'outcome', 'clientStatus', 'boolean', 'enabled']),
+  kind: PropTypes.oneOf(['health', 'outcome', 'clientStatus', 'database', 'boolean', 'enabled']),
   className: PropTypes.string,
 }
 

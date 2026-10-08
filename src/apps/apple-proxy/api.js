@@ -1,7 +1,6 @@
 import { createApiClient } from '../../api/http'
 
-export const APPLE_PROXY_BASE_URL =
-  import.meta.env.VITE_APPLE_PROXY_API_URL || '/api/proxy-manager'
+export const APPLE_PROXY_BASE_URL = import.meta.env.VITE_APPLE_PROXY_API_URL || '/api/proxy-manager'
 
 const client = createApiClient({ baseUrl: APPLE_PROXY_BASE_URL })
 
@@ -65,6 +64,20 @@ export const outcomes = {
   retrieve: (id, options) => client.get(`/outcomes/${id}/`, options),
 }
 
+export const databaseBackups = {
+  list: (options) => client.get('/backups/', options),
+  retrieve: (id, options) => client.get(`/backups/${id}/`, options),
+  create: () => client.post('/backups/', {}),
+  remove: (id, options) => client.delete(`/backups/${id}/`, options),
+  download: (id, options) => client.download(`/backups/${id}/download/`, options),
+  restore: (id, confirmation) => client.post(`/backups/${id}/restore/`, { confirmation }),
+}
+
+export const restoreJobs = {
+  list: (options) => client.get('/restore-jobs/', options),
+  retrieve: (id, options) => client.get(`/restore-jobs/${id}/`, options),
+}
+
 export const leases = {
   list: (options) => client.get('/leases/', options),
   retrieve: (id, options) => client.get(`/leases/${id}/`, options),
@@ -92,6 +105,7 @@ export const OUTCOME_SOURCES = [
 ]
 export const SCHEMES = ['http', 'https', 'socks5']
 export const CLIENT_STATUSES = ['acquired', 'running', 'finished', 'failed']
+export const DATABASE_STATUSES = ['queued', 'running', 'completed', 'failed']
 /** Server-side computed views over a lease; `stuck` means running but expired. */
 export const LEASE_LIFECYCLES = ['active', 'expired', 'released', 'stuck']
 

@@ -10,6 +10,7 @@ const Leases = React.lazy(() => import('./views/Leases'))
 const Outcomes = React.lazy(() => import('./views/Outcomes'))
 const AllocationWindows = React.lazy(() => import('./views/AllocationWindows'))
 const DriftEvents = React.lazy(() => import('./views/DriftEvents'))
+const DatabaseOperations = React.lazy(() => import('./views/DatabaseOperations'))
 
 const basePath = '/apps/apple-proxy'
 
@@ -44,6 +45,11 @@ const appleProxyApp = {
       element: AllocationWindows,
     },
     { path: `${basePath}/drift-events`, name: 'Drift Events', element: DriftEvents },
+    {
+      path: `${basePath}/database`,
+      name: 'Database Operations',
+      element: DatabaseOperations,
+    },
   ],
   navItems: [
     { name: 'Overview', to: basePath, icon: 'fa-solid fa-gauge-high' },
@@ -67,6 +73,11 @@ const appleProxyApp = {
       name: 'Drift Events',
       to: `${basePath}/drift-events`,
       icon: 'fa-solid fa-arrows-turn-to-dots',
+    },
+    {
+      name: 'Database',
+      to: `${basePath}/database`,
+      icon: 'fa-solid fa-database',
     },
   ],
 }
