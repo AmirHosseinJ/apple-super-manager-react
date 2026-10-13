@@ -75,6 +75,12 @@ const Endpoints = () => {
 
   const columns = [
     {
+      key: 'id',
+      label: 'ID',
+      sortable: true,
+      render: (endpoint) => <code>{endpoint.id}</code>,
+    },
+    {
       key: 'group',
       label: 'Provider',
       sortable: true,
