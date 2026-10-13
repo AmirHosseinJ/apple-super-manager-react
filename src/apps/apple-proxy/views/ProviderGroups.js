@@ -87,6 +87,12 @@ const ProviderGroups = () => {
           : Number(g.health_score).toFixed(2),
     },
     {
+      key: 'reset_delay',
+      label: 'Reuse delay',
+      sortable: true,
+      render: (g) => `${g.reset_delay ?? 0}s`,
+    },
+    {
       key: 'quarantined_until',
       label: 'Quarantined until',
       render: (g) => <RelativeTime value={g.quarantined_until} />,
@@ -157,13 +163,22 @@ const ProviderGroups = () => {
       label: 'Provider key',
       hint: 'Optional. Defaults to the display name. Normalised server-side to lowercase, single-spaced text.',
     },
+    {
+      name: 'reset_delay',
+      label: 'Endpoint reuse delay (seconds)',
+      type: 'number',
+      min: 0,
+      step: 1,
+      defaultValue: 0,
+      hint: 'Measured from lease acquisition. After release, the endpoint remains unavailable until this delay has elapsed.',
+    },
   ]
 
   return (
     <>
       <PageHeader
         title="Provider Groups"
-        description="Upstream proxy providers. Health fields are maintained by the probe pipeline and are read-only here."
+        description="Upstream proxy providers. When server-side IP rotation is enabled, the selected endpoint is rotated before its lease is returned. Health fields are read-only here."
         actions={
           <CButton color="primary" onClick={() => setEditing({})}>
             <i className="fa-solid fa-plus me-2" />
@@ -210,14 +225,19 @@ const ProviderGroups = () => {
         onSubmit={handleSave}
         onClose={() => setEditing(null)}
       >
-        {({ values }) =>
-          values.provider_key || values.display_name ? (
-            <div className="form-text">
-              Stored key will be{' '}
-              <code>{normaliseProviderKey(values.provider_key || values.display_name)}</code>
+        {({ values }) => (
+          <>
+            {values.provider_key || values.display_name ? (
+              <div className="form-text">
+                Stored key will be{' '}
+                <code>{normaliseProviderKey(values.provider_key || values.display_name)}</code>
+              </div>
+            ) : null}
+            <div className="form-text mt-2">
+              IP rotation is configured by the backend and runs before a new lease is returned.
             </div>
-          ) : null
-        }
+          </>
+        )}
       </ResourceModal>
 
       <ConfirmDialog
