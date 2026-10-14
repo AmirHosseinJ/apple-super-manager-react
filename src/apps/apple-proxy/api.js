@@ -22,6 +22,8 @@ export const proxyGroups = {
 
 export const proxyEndpoints = {
   ...resource('endpoints'),
+  /** Atomically creates multiple proxy endpoints. */
+  bulkCreate: (payload) => client.post('/endpoints/bulk-create/', payload),
   /** 202 when queued, 409 when checks are disabled for the endpoint. */
   probe: (id) => client.post(`/endpoints/${id}/probe/`),
 }

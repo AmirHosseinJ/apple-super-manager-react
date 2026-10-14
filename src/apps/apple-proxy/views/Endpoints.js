@@ -11,6 +11,7 @@ import {
   StatusBadge,
 } from '../../../components/common'
 import { HEALTH_STATUSES, SCHEMES, proxyEndpoints, proxyGroups } from '../api'
+import BulkEndpointModal from './BulkEndpointModal'
 
 const Endpoints = () => {
   const [filters, setFilters] = useState({ group: '', health_status: '', admin_enabled: '' })
@@ -26,6 +27,7 @@ const Endpoints = () => {
   const { options: groups } = useOptions(useCallback((options) => proxyGroups.list(options), []))
 
   const [editing, setEditing] = useState(null)
+  const [bulkCreating, setBulkCreating] = useState(false)
   const [disabling, setDisabling] = useState(null)
   const [notice, setNotice] = useState(null)
 
@@ -34,6 +36,7 @@ const Endpoints = () => {
   )
   const deleteMutation = useMutation((endpoint) => proxyEndpoints.remove(endpoint.id))
   const probeMutation = useMutation((endpoint) => proxyEndpoints.probe(endpoint.id))
+  const bulkCreateMutation = useMutation((payload) => proxyEndpoints.bulkCreate(payload))
 
   const groupNameById = useMemo(
     () => new Map(groups.map((group) => [group.id, group.display_name || group.provider_key])),
@@ -70,6 +73,20 @@ const Endpoints = () => {
       })
     } catch (error) {
       setNotice({ color: error.isConflict ? 'warning' : 'danger', text: error.message })
+    }
+  }
+
+  const handleBulkCreate = async (payload) => {
+    try {
+      const result = await bulkCreateMutation.run(payload)
+      setBulkCreating(false)
+      collection.refresh()
+      setNotice({
+        color: 'success',
+        text: `Created ${result?.created ?? payload.endpoints.length} proxy endpoint(s).`,
+      })
+    } catch {
+      // Rendered in the bulk-create modal.
     }
   }
 
@@ -303,10 +320,16 @@ const Endpoints = () => {
         title="Proxy Endpoints"
         description="Individual upstream proxies. An endpoint is leasable only when it is active, admin-enabled and healthy."
         actions={
-          <CButton color="primary" onClick={() => setEditing({})}>
-            <i className="fa-solid fa-plus me-2" />
-            New endpoint
-          </CButton>
+          <div className="d-flex gap-2">
+            <CButton color="secondary" onClick={() => setBulkCreating(true)}>
+              <i className="fa-solid fa-file-import me-2" />
+              Bulk create
+            </CButton>
+            <CButton color="primary" onClick={() => setEditing({})}>
+              <i className="fa-solid fa-plus me-2" />
+              New endpoint
+            </CButton>
+          </div>
         }
       />
 
@@ -349,6 +372,20 @@ const Endpoints = () => {
         onSubmit={handleSave}
         onClose={() => setEditing(null)}
       />
+
+      {bulkCreating && (
+        <BulkEndpointModal
+          visible={bulkCreating}
+          groups={groups}
+          pending={bulkCreateMutation.pending}
+          error={bulkCreateMutation.error}
+          onSubmit={handleBulkCreate}
+          onClose={() => {
+            bulkCreateMutation.reset()
+            setBulkCreating(false)
+          }}
+        />
+      )}
 
       <ConfirmDialog
         visible={Boolean(disabling)}
