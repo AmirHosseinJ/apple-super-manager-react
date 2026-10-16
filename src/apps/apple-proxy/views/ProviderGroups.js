@@ -93,6 +93,12 @@ const ProviderGroups = () => {
       render: (g) => `${g.reset_delay ?? 0}s`,
     },
     {
+      key: 'reset_cycle',
+      label: 'Rotation cycle',
+      sortable: true,
+      render: (g) => `${g.reset_cycle ?? 0}s`,
+    },
+    {
       key: 'quarantined_until',
       label: 'Quarantined until',
       render: (g) => <RelativeTime value={g.quarantined_until} />,
@@ -172,13 +178,22 @@ const ProviderGroups = () => {
       defaultValue: 0,
       hint: 'Measured from lease acquisition. After release, the endpoint remains unavailable until this delay has elapsed.',
     },
+    {
+      name: 'reset_cycle',
+      label: 'IP rotation cycle (seconds)',
+      type: 'number',
+      min: 0,
+      step: 1,
+      defaultValue: 0,
+      hint: 'Zero rotates before every lease. A positive value rotates only endpoints used within this interval; never-used and older endpoints skip rotation.',
+    },
   ]
 
   return (
     <>
       <PageHeader
         title="Provider Groups"
-        description="Upstream proxy providers. When server-side IP rotation is enabled, the selected endpoint is rotated before its lease is returned. Health fields are read-only here."
+        description="Upstream proxy providers. Configure endpoint reuse and IP rotation timing here; health fields are read-only."
         actions={
           <CButton color="primary" onClick={() => setEditing({})}>
             <i className="fa-solid fa-plus me-2" />
@@ -234,7 +249,8 @@ const ProviderGroups = () => {
               </div>
             ) : null}
             <div className="form-text mt-2">
-              IP rotation is configured by the backend and runs before a new lease is returned.
+              Rotation is configured by the backend and runs before a new lease is returned when the
+              selected group&apos;s IP rotation cycle requires it.
             </div>
           </>
         )}

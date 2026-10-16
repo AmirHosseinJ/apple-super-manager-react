@@ -107,6 +107,16 @@ await updateToken(30)
 fetch('/api/things', { headers: { Authorization: `Bearer ${keycloak.token}` } })
 ```
 
+## Proxy Provider Settings
+
+The **Provider Groups** page configures two server-enforced timings, both in seconds:
+
+- **Endpoint reuse delay** (`reset_delay`) keeps an endpoint unavailable after release until
+  the configured interval since lease acquisition has passed. `0` allows immediate reuse.
+- **IP rotation cycle** (`reset_cycle`) controls rotation before a lease is returned. `0` rotates
+  on every lease; a positive value rotates endpoints used within the interval and skips rotation
+  for never-used endpoints or endpoints last used before the interval.
+
 ## Testing the login flow
 
 ```bash
